@@ -1,0 +1,7 @@
+Body
+	-solidBody
+		-Ship
+		-Rocket
+	-energyBody
+		-Laser
+		-Explosion

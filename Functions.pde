@@ -30,10 +30,54 @@ final int other_sound = 1;
 final int weapons_sound = 2;
 float volume = 0;
 
-void loadAssets() {
+float universeWidth = 1000;
+float universeHeight = 1000;
 
+float viewCoefficient = 1;
+
+float w = int(universeWidth * viewCoefficient);
+float h = int(universeHeight * viewCoefficient);
+
+float gameTime(float time) {
+  return int(frameRate * time/1000);
+}
+
+boolean timer(float previus, float interval) {
+  return frameCount - previus >= interval;
+}
+
+void grid(float k) {
+  stroke(255);
+  for (int x=0; x<=universeWidth; x+=k) line(x, 0, x, universeHeight);
+  for (int y=0; y<=universeHeight; y+=k) line(0, y, universeWidth, y);
+}
+
+//returnes the same string n times concatenated to s
+String repeat(String s, int n) {
+  String str = "";
+  for (int i=0; i<n; i++) str += s;
+  return str;
+}
+
+boolean angleRangeTest(PVector pos1, PVector pos2, float angle, float range) {
+  float relativeAngle = atan2(pos1.y - pos2.y, pos1.x - pos2.x);
+  if (relativeAngle >= angle - range/2 && relativeAngle <= angle + range/2) {
+  }
+  return true;
+}
+
+//void updateMenu(Ship i) {
+//  gameStat.set("Life:", i.life + "");
+//  gameStat.set("Damage:", i.damage + "");
+//  gameStat.set("Speed:", i.speed + "");
+//  gameStat.set("Shield damage:", "0");
+//  gameStat.set("Shield integrity:", i.shield.power+"%");
+//}
+
+
+void loadAssets() {
   for (int i=0; i<supergate_images.length; i++) {
-    String name = ((i < 9)? "0": "") + (i + 1) + ".png";
+    String name = ((i < 10)? "0": "") + i + ".png";
     supergate_images[i] = loadImage("images/gate/open/frame_" + name);
   }
 
@@ -182,71 +226,3 @@ void loadAssets() {
   sound_files[3][0].amp(volume*2);
   sound_files[3][1].amp(volume*2);
 }
-
-
-float universeWidth = 1000;
-float universeHeight = 1000;
-
-float viewCoefficient = 1;
-
-float w = int(universeWidth * viewCoefficient);
-float h = int(universeHeight * viewCoefficient);
-
-float getX(float x, float x1) {
-  return (x1-x+w/2)*width/w;
-}
-
-float getY(float y, float y1) {
-  return  (y1-y+h/2)*height/h;
-}
-
-float gameTime(float time) {
-  return int(frameRate * time/1000);
-}
-
-boolean timer(float previus, float interval) {
-  return frameCount - previus >= interval;
-}
-
-void grid(float k) {
-  stroke(255);
-  for (int x=0; x<=width; x+=k) {
-    //line(getX(pos.x, x), getY(pos.y, 0), getX(pos.x, x), getY(pos.y, H));
-    line(x, 0, x, height);
-  }
-
-  for (int y=0; y<=height; y+=k) {
-    //line(getX(pos.x, 0), getY(pos.y, y), getX(pos.x, W), getY(pos.y, y));
-    line(0, y, width, y);
-  }
-}
-
-//returnes the same string n times concatenated to s
-String repeat(String s, int n) {
-  String str = "";    //make a new string and the it concatenates it with the string provide n times
-  for (int i=0; i<n; i++) str += s;
-  return str;
-}
-
-boolean angleRangeTest(PVector pos1, PVector pos2, float angle, float range) {
-  float relativeAngle = atan2(pos1.y - pos2.y, pos1.x - pos2.x);
-  if (relativeAngle >= angle - range/2 && relativeAngle <= angle + range/2) {
-  }
-  return true;
-}
-
-void updateMenu(Ship i) {
-  gameStat.set("Life:", i.life + "");
-  gameStat.set("Damage:", i.damage + "");
-  gameStat.set("Speed:", i.speed + "");
-  gameStat.set("Shield damage:", "0");
-  gameStat.set("Shield integrity:", i.shield.power+"%");
-}
-
-
-//class solidBody {
-//  PVector pos, vel;
-//  float angle, damage, life;
-//  boolean alive;
-//  int id;
-//}

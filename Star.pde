@@ -9,7 +9,7 @@ class Star extends Body {
     type = type_;
     animationTimer = frameCount;
 
-    animationInterval = animationTime / star_images[type].length;
+    animationInterval = animationTime / star_images[type].length; //<>//
   }
 
   void show() {

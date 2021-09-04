@@ -9,9 +9,8 @@ float screen_offset = 100;
 
 //game menu vars
 float fontSize = 32;
-float charWidth = 0, charHeight = 10;
+float charWidth = 0, charHeight = 20;
 int textHeight = (int) charHeight;
-StringDict gameStat = new StringDict();
 Menu gameMenu;
 
 
@@ -19,15 +18,15 @@ PImage backgroundImg;
 float explosionVel = 1;
 ArrayList<Explosion> animations = new ArrayList<Explosion>();
 ArrayList<Ship> ships = new ArrayList<Ship>();
-ArrayList<solidBody> wepons = new ArrayList<solidBody>();
+ArrayList<Weapon> wepons = new ArrayList<Weapon>();
 ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
 HashMap<Character, Boolean> keyMap = new HashMap<Character, Boolean>();
 
-int allShips = 5;
-int presentShips = 5;
+PFont fonts[] = new PFont[4];
 
-Hatak pl;
-Star st;
+Hatak playerShip;
+//Star st;
+//Stargate s;
 
 void setup() {
   size(960, 600);
@@ -36,16 +35,14 @@ void setup() {
   backgroundImg.resize(width, height);
   imageMode(CENTER);
 
-  textFont(createFont(PFont.list()[72], fontSize));
+  fonts[0] = createFont("font_0.ttf", fontSize);
+  fonts[1] = createFont("font_1.ttf", fontSize);
+  fonts[2] = createFont("font_2.ttf", fontSize);
+  fonts[3] = createFont("font_3.ttf", fontSize);
+
+  textFont(fonts[3]);
   textSize(textHeight);
   charWidth = textWidth(" ");
-  gameStat.set("Life:", "          0");  //extra spacing is added at the end so that is fits on the screen
-  gameStat.set("Damage:", "0");
-  gameStat.set("Speed:", "0");
-  gameStat.set("Shield damage:", "0");
-  gameStat.set("Shield integrity:", "0%");
-  gameMenu = new Menu(0, 0, gameStat, #ffffff);
-  gameMenu.setPos(width - gameMenu.w - 10, height - gameMenu.h - 10);
 
   loadAssets();
 
@@ -57,55 +54,61 @@ void setup() {
   keyMap.put('t', false);
   keyMap.put(' ', false);
 
-  pl = new Hatak();
-  pl.reloadTime = 30;
+
+  playerShip = new Hatak();
+  playerShip.reloadTime = 30;
+  playerShip.life = 1000;
+  playerShip.initial_life = 1000;
+
+  gameMenu = new Menu(0, 0, #ffffff);
+  gameMenu.setPos(width - gameMenu.w - 20, height - gameMenu.h - 20);
 
   for (int i=0; i<1; i++) {
     ships.add(new OriMothership(1));
     //ships.add(new Hatak(2));
 
     //ships.add(new AsgardShip(3));
-    ships.add(new GoauldMothership(4));
+    //ships.add(new GoauldMothership(4));
   }
 
-  for (int i=0; i<2; i++) {
+  for (int i=0; i<1; i++) {
     asteroids.add(new Asteroid());
   }
   println("loading time: " + (millis() - startTime));
 
-  st = new Star(0);
+  //st = new Star(1);
+  //s = new Stargate();
 }
 
-Stargate s = new Stargate();
-
 void draw() {
-  background(0);
   background(backgroundImg);
   //image(backgroundImg, -width/2-pl.pos.x, -height/2-pl.pos.y);
 
-  updateMenu(pl);
+  gameMenu.update(playerShip);
   pushMatrix();
   translate(width/2, height/2);
   scale(1);
-  translate(-pl.pos.x, -pl.pos.y);
+  translate(-playerShip.pos.x, -playerShip.pos.y);
 
 
   grid(100);
 
-  s.show();
+  //s.show();
+  //s.spawn();
+  //s.deactivate();
 
-  st.show();
+  //st.show();
 
-  pl.shoot();
-  pl.userMove();
-  pl.shipHeal();
-  pl.spin();
-  pl.show();
-  pl.die(true);
+  playerShip.shoot();
+  playerShip.userMove();
+  playerShip.shipHeal();
+  playerShip.spin();
+  playerShip.show();
+  playerShip.die(true);
 
   //wepons
   for (int i=wepons.size()-1; i>=0; i--) {
-    pl.hit(wepons.get(i));
+    playerShip.hit(wepons.get(i));
     wepons.get(i).move();
     wepons.get(i).show();
     wepons.get(i).die();
@@ -113,7 +116,7 @@ void draw() {
 
   //asteroids
   for (int i=asteroids.size()-1; i>=0; i--) {
-    pl.hitAsteroid(asteroids.get(i));
+    playerShip.hitAsteroid(asteroids.get(i));
     asteroids.get(i).move();
     asteroids.get(i).spin();
 
@@ -122,15 +125,15 @@ void draw() {
     }
 
     asteroids.get(i).show();
-    asteroids.get(i).die(true);
+    asteroids.get(i).die(false);
   }
 
   //ships
   for (int i=ships.size()-1; i>=0; i--) {
     ships.get(i).shipHeal();
-    //ships.get(i).autoShoot(pl.pos);
-    //ships.get(i).follow(pl.pos);
-    ships.get(i).battel();
+    ships.get(i).autoShoot(playerShip.pos);
+    ships.get(i).follow(playerShip.pos);
+    //ships.get(i).battel();
 
     for (int k=asteroids.size()-1; k>=0; k--) {
       ships.get(i).hitAsteroid(asteroids.get(k));
@@ -142,7 +145,7 @@ void draw() {
     }
 
     ships.get(i).show();
-    ships.get(i).die(true);
+    ships.get(i).die(false);
   }
 
   //animations
@@ -152,8 +155,6 @@ void draw() {
   }
   popMatrix();
   gameMenu.display();
-
-  //println(frameRate);
 }
 
 void keyPressed() {

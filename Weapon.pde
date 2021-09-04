@@ -69,6 +69,8 @@ class Weapon extends solidBody { //<>//
     accel.add(force);
     accel.limit(0.5);
     vel.add(accel);
+    vel.limit(speed);
+    pos.add(vel);
     angle = HALF_PI + atan2(vel.y, vel.x);
   }
 }
@@ -102,8 +104,8 @@ class OriWeapon extends Weapon {
   static final float OriWeaponDamage = 80;
   static final int OriWeaponType = 6;
   static final int OriWeaponSoundType = 11;
-
-  PVector light_trail[] = new PVector[10];
+  float tint = 0;
+  PVector light_trail[] = new PVector[20];
 
   void initializeTrail() {
     for (int i=0; i<light_trail.length; i++) light_trail[i] = new PVector();
@@ -125,8 +127,11 @@ class OriWeapon extends Weapon {
       pushMatrix();
       translate(light_trail[t].x, light_trail[t].y);
       rotate(angle);
-      //this leaves a tral of the same image behind 
-      tint(#ffffff, 255-t*(250/light_trail.length));
+      //float a = map(t*(255/light_trail.length), 0, 255, 0, 54);
+      //tint = 255 - map(log(a+1), 0, 54, 0, 255);
+      //this leaves a tral of the same image behind
+      tint = 255-2*(t*(250/light_trail.length));
+      tint(#ffffff, tint);
       image(missile_images[type], 0, 0);
       noTint();
       popMatrix();

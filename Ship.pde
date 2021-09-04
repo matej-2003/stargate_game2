@@ -207,12 +207,12 @@ class Ship extends solidBody {
   Weapon fire(PVector pos_, float x, float y) {
     return new Weapon();
   }
-  
+
   void shoot() {
     if (timer(fireTime, reloadTime)) {
       if (mousePressed && mouseButton == LEFT) wepons.add(fire(pos, mouseX+pos.x-width/2, mouseY+pos.y-height/2));
-      if (mousePressed && mouseButton == RIGHT) wepons.add(new Laser(pos, mouseX+pos.x-width/2, mouseY+pos.y-height/2, id, group));
-      if (keyMap.get(' ')) wepons.add(new Blast(pos, mouseX+pos.x-width/2, mouseY+pos.y-height/2, id, group, damage));
+      //if (mousePressed && mouseButton == RIGHT) wepons.add(new Laser(pos, mouseX+pos.x-width/2, mouseY+pos.y-height/2, id, group));
+      //if (keyMap.get(' ')) wepons.add(new Blast(pos, mouseX+pos.x-width/2, mouseY+pos.y-height/2, id, group, damage));
       if (keyMap.get('t')) wepons.add(new STM(pos, mouseX+pos.x-width/2, mouseY+pos.y-height/2, id, group));
       fireTime = frameCount;
     }
@@ -243,13 +243,26 @@ class Ship extends solidBody {
   //}
 
   void follow(PVector pos_) {
+    float followDistance = 150;
     angle = atan2(vel.y, vel.x) - HALF_PI;
     vel = pos_.copy();
     vel.sub(pos);
     vel.normalize();
     vel.mult(speed);
 
-    if (pos.dist(pos_) > 300) {
+    if (pos.dist(pos_) > followDistance) {
+      for (int i=0; i<ships.size(); i++) {
+        if (ships.get(i).group == group) {
+          float dis = pos.dist(ships.get(i).pos);
+          constrain(dis, 0, followDistance);
+          float forceMag = 1 - map(dis, 0, followDistance, 0, 1);
+          PVector force = ships.get(i).pos.copy();
+          force.sub(pos);
+          force.normalize();
+          force.mult(-forceMag);
+          pos.add(force);
+        }
+      }
       move();
     }
   }

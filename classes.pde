@@ -3,10 +3,6 @@ class Body {
   int id, group;
 }
 
-interface WeaponFun {
-  void hitResponse();
-}
-
 class solidBody extends Body {
   float damage;
   float angle, life, initial_life, range, speed, speed_limit;
@@ -21,7 +17,6 @@ class solidBody extends Body {
   }
   void hitResponse() {
   }
-
 
   float getAngle() {
     return angle;
